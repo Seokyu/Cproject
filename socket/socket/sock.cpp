@@ -18,7 +18,11 @@ int main() {
 	cout << "URL Input :";
 	cin >> URL;
 	struct hostent *host;
-	host = gethostbyname(URL);
+	if ((host = gethostbyname(URL)) == 0) {
+		cout << "No signal";
+		system("pause");
+		return 1;
+	}
 
 	SOCKADDR_IN SockAddr;
 	SockAddr.sin_port = htons(80);

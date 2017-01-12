@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <iostream>
 #pragma comment(lib, "ws2_32.lib")
+#define BUFSIZE 1024
 
 using namespace std;
 
@@ -37,15 +38,20 @@ int main() {
 	}
 
 	cout << "Connected.\n";
-	char msg[512] = {0,};
+	char msg[BUFSIZE] = {0,};
 	sprintf(msg, "GET / HTTP/1.1\r\nHost: %s\r\n\r\n", URL);
-
 	send(Socket, (char *)msg , strlen(msg), 0);
 
-	char buffer[512] = {0,};
-	recv(Socket, buffer, 512, 0);
+	char buffer[BUFSIZE] = {0,};
+	int length;
+
+	while (1) {
+		if ((length = recv(Socket, buffer, BUFSIZE, 0)) == 0) 
+			break;
+	}
 
 	cout << buffer;
+	memset(buffer, 0, BUFSIZE);
 	closesocket(Socket);
 	WSACleanup();
 	system("pause");

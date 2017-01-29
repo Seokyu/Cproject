@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     pcap_close(pd);
-    return 0;
+    return ;
 }
 
 void packet_view(unsigned char *user, const struct pcap_pkthdr *h, const unsigned char *p) {

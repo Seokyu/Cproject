@@ -49,15 +49,17 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     pcap_close(pd);
-    return ;
+    return 0;
 }
 
 void packet_view(unsigned char *user, const struct pcap_pkthdr *h, const unsigned char *p) {
     int len = 0;
+    int datalen = 0;
     struct ip *iph;
     struct ether_header *etherh;
     unsigned short e_type;
     struct tcphdr *tcph;
+    unsigned char *tcpdata;
 
     etherh = (struct ether_header *)p;
 
@@ -105,18 +107,23 @@ void packet_view(unsigned char *user, const struct pcap_pkthdr *h, const unsigne
         tcph = (struct tcphdr *)(p + iph->ip_hl * 4);
         printf("Src Port : %d\n" , ntohs(tcph->source));
         printf("Dst Port : %d\n" , ntohs(tcph->dest));
+
+        //Packet 받아오기
+        printf("PACKET\n");
+        datalen = ntohs(iph->ip_len)-((iph->ip_hl * 4)+(tcph->doff * 4));
+        if(datalen > 0){
+            tcpdata = (unsigned char *)(p + (iph->ip_hl * 4) + (tcph->doff * 4));
+            while(len < datalen) {
+                printf("%02x ", *(tcpdata++));
+                if(!(++len % 16))
+                    printf("\n");
+            }
+        } else {
+            printf("NO TCP Segment data\n");
+        }
     } else {
         printf("NO TCP Protocol\n");
     }
-
-    //Packet 받아오기
-    printf("PACKET\n");
-    while(len < h->len) {
-        printf("%02x ", *(p++));
-        if(!(++len % 16))
-            printf("\n");
-    }
-
     printf("\n========================================================================\n");
     return ;
 }
